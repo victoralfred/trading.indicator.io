@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: The State of Global Renewable Energy 2024</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A top-down narrative SPA. The structure guides the user from a high-level overview to specific details, creating a story-like flow. It starts with a hero section for impact, moves to overall growth (line chart), then current composition (donut chart), regional investment (interactive bar chart), and finally qualitative challenges (tabbed content). This logical progression was chosen over a complex dashboard to make the report's key findings accessible and understandable for a broad audience, facilitating comprehension step-by-step. Navigation is supported by a sticky header for quick access to each thematic section. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Total renewable capacity growth over years. -> Goal: Show change. -> Viz: Line Chart. -> Interaction: Hover for tooltips. -> Justification: Best for time-series data. -> Library: Chart.js.
+        - Report Info: Breakdown of renewable sources in 2024. -> Goal: Show proportions. -> Viz: Donut Chart. -> Interaction: Hover highlights segments and updates a central text block. -> Justification: Visually engaging for part-to-whole relationships. -> Library: Chart.js.
+        - Report Info: Investment by region. -> Goal: Compare categories. -> Viz: Bar Chart. -> Interaction: Buttons to filter data by year, triggering animated chart updates. -> Justification: Clear comparison of discrete data points; interaction adds depth. -> Library: Chart.js.
+        - Report Info: Key challenges (text-heavy). -> Goal: Organize content. -> Viz: Tabbed Interface. -> Interaction: Click to switch content panel. -> Justification: Breaks down dense text into digestible, user-selectable topics. -> Method: HTML/CSS/JS.
+        - Report Info: Key metric (job creation). -> Goal: Inform with impact. -> Viz: Large animated number. -> Justification: More striking and memorable than a simple text block for a single, powerful statistic. -> Method: HTML/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7;
+            color: #374151;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #2563EB;
+        }
+        .tab-btn.active {
+            border-color: #2563EB;
+            color: #2563EB;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Renewable Energy 2024</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#overview" class="nav-link text-gray-600">Overview</a>
+                <a href="#mix" class="nav-link text-gray-600">Energy Mix</a>
+                <a href="#investment" class="nav-link text-gray-600">Investment</a>
+                <a href="#challenges" class="nav-link text-gray-600">Challenges</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-16">
+
+        <section id="hero" class="text-center mb-16 md:mb-24">
+            <h2 class="text-4xl md:text-6xl font-bold text-gray-900 mb-4">The State of Global Renewable Energy</h2>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                A 2024 analysis of the accelerating transition to clean energy, highlighting record growth, investment trends, and the critical challenges ahead.
+            </p>
+        </section>
+
+        <section id="overview" class="mb-16 md:mb-24">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-800">A Decade of Unprecedented Growth</h3>
+                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">This section illustrates the remarkable expansion of global renewable energy capacity over the past decade. The chart below visualizes the cumulative growth, showing a clear and accelerating trend towards sustainable power sources. Interact with the chart by hovering over data points to see the specific capacity for each year.
+                </p>
+            </div>
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="mix" class="mb-16 md:mb-24">
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <div class="text-left">
+                    <h3 class="text-3xl font-bold text-gray-800 mb-4">2024 Renewable Energy Mix</h3>
+                    <p class="text-gray-600 mb-4">
+                        Here we explore the composition of the global renewable energy portfolio as of 2024. While hydropower has historically been a major contributor, solar and wind energy are now dominating new capacity additions. Hover over the donut chart segments to see the percentage share of each technology and watch this text update with specific details.
+                    </p>
+                    <div id="mix-details" class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg">
+                        <h4 id="mix-title" class="font-bold text-lg">Solar Power</h4>
+                        <p id="mix-text">Solar leads the pack, accounting for the largest share of renewable capacity due to falling costs and widespread deployment.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                    <div class="chart-container">
+                        <canvas id="mixChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="investment" class="mb-16 md:mb-24">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-800">The Global Investment Landscape</h3>
+                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">
+                    Financial commitment is crucial for the energy transition. This section presents a comparative view of renewable energy investments across major global regions. Use the buttons to switch between years and observe how investment patterns have shifted, reflecting changing priorities and economic landscapes.
+                </p>
+            </div>
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                <div class="flex justify-center space-x-2 mb-4">
+                    <button id="btn-2020" class="investment-btn px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">2020</button>
+                    <button id="btn-2024" class="investment-btn px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">2024</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="investmentChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges" class="mb-16 md:mb-24">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-800">Challenges on the Horizon</h3>
+                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">
+                    Despite rapid growth, the path to a fully renewable future is not without obstacles. This section details the primary challenges identified in the report. Click through the tabs to learn more about the complexities of grid integration, the necessity of energy storage solutions, and the critical role of supportive policy frameworks.
+                </p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="border-b border-gray-200 mb-4">
+                    <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="grid">Grid Integration</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="storage">Energy Storage</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="policy">Policy & Regulation</button>
+                    </nav>
+                </div>
+                <div id="tab-content" class="bg-white p-6 rounded-lg shadow">
+                    <div id="grid" class="tab-panel">
+                        <h4 class="font-bold text-xl mb-2">Modernizing the Grid</h4>
+                        <p class="text-gray-600">The variable nature of solar and wind power presents a significant challenge for traditional electricity grids. Upgrading infrastructure to create "smart grids" is essential for managing fluctuations, ensuring stability, and preventing blackouts. This involves investing in advanced monitoring systems, bidirectional power flow capabilities, and improved forecasting technologies to balance supply and demand in real-time.</p>
+                    </div>
+                    <div id="storage" class="tab-panel hidden">
+                        <h4 class="font-bold text-xl mb-2">The Storage Imperative</h4>
+                        <p class="text-gray-600">Effective energy storage is the key to unlocking the full potential of renewables. It allows energy generated during peak production times (e.g., sunny or windy days) to be stored and dispatched when needed, ensuring a consistent power supply. While lithium-ion batteries dominate, research into alternative solutions like hydrogen fuel cells, pumped-hydro storage, and thermal storage is critical for long-duration and grid-scale applications.</p>
+                    </div>
+                    <div id="policy" class="tab-panel hidden">
+                        <h4 class="font-bold text-xl mb-2">Supportive Policy Frameworks</h4>
+                        <p class="text-gray-600">Clear, consistent, and long-term government policies are fundamental to attracting investment and accelerating deployment. This includes setting ambitious renewable energy targets, streamlining permitting processes, offering financial incentives like tax credits or feed-in tariffs, and establishing carbon pricing mechanisms. International cooperation is also vital for sharing technology and best practices to ensure a coordinated global transition.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>Source: Fictional "State of Global Renewable Energy 2024" Report.</p>
+            <p class="text-sm text-gray-400 mt-2">This interactive application was generated to demonstrate data visualization and user experience design.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartColors = {
+                blue: 'rgba(59, 130, 246, 0.8)',
+                sky: 'rgba(14, 165, 233, 0.8)',
+                teal: 'rgba(20, 184, 166, 0.8)',
+                amber: 'rgba(245, 158, 11, 0.8)',
+                indigo: 'rgba(99, 102, 241, 0.8)',
+                bgBlue: 'rgba(59, 130, 246, 0.2)',
+                bgSky: 'rgba(14, 165, 233, 0.2)',
+                bgTeal: 'rgba(20, 184, 166, 0.2)',
+                bgAmber: 'rgba(245, 158, 11, 0.2)',
+                bgIndigo: 'rgba(99, 102, 241, 0.2)',
+            };
+
+            const wrapText = (str, maxWidth) => {
+                if (str.length <= maxWidth) return str;
+                const words = str.split(' ');
+                const lines = [];
+                let currentLine = words[0];
+                for (let i = 1; i < words.length; i++) {
+                    if (currentLine.length + words[i].length + 1 < maxWidth) {
+                        currentLine += ' ' + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            };
+
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#4B5563',
+                            font: {
+                                family: "'Inter', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1F2937',
+                        titleFont: { size: 14, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                        padding: 12,
+                        cornerRadius: 4,
+                        displayColors: true,
+                        boxPadding: 4,
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#6B7280' },
+                        grid: { display: false }
+                    },
+                    y: {
+                        ticks: { color: '#6B7280' },
+                        grid: { color: '#E5E7EB' }
+                    }
+                }
+            };
+
+            const growthData = {
+                labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Global Renewable Capacity (GW)',
+                    data: [1985, 2195, 2387, 2588, 2805, 3080, 3404, 3736, 4112, 4550],
+                    fill: true,
+                    borderColor: chartColors.blue,
+                    backgroundColor: chartColors.bgBlue,
+                    tension: 0.3,
+                    pointBackgroundColor: chartColors.blue,
+                    pointHoverRadius: 7,
+                }]
+            };
+
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            new Chart(growthCtx, {
+                type: 'line',
+                data: growthData,
+                options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } } }
+            });
+
+            const mixDataRaw = {
+                labels: ['Solar Power', 'Wind Power', 'Hydropower', 'Bioenergy', 'Other'],
+                values: [45, 30, 15, 7, 3],
+                descriptions: {
+                    'Solar Power': 'Solar leads the pack, accounting for the largest share of renewable capacity due to falling costs and widespread deployment.',
+                    'Wind Power': 'Wind power, both onshore and offshore, is a major contributor, providing a significant portion of the world\'s clean energy.',
+                    'Hydropower': 'As a long-standing renewable source, hydropower provides stable, large-scale electricity but has slower growth in new capacity.',
+                    'Bioenergy': 'Derived from organic matter, bioenergy plays a role in waste reduction and provides a consistent energy source.',
+                    'Other': 'This category includes geothermal, concentrated solar power, and ocean energy, which are emerging technologies with future potential.'
+                }
+            };
+
+            const mixCtx = document.getElementById('mixChart').getContext('2d');
+            const mixChart = new Chart(mixCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: mixDataRaw.labels,
+                    datasets: [{
+                        label: 'Energy Mix',
+                        data: mixDataRaw.values,
+                        backgroundColor: [chartColors.amber, chartColors.sky, chartColors.blue, chartColors.teal, chartColors.indigo],
+                        borderColor: '#FDFBF7',
+                        borderWidth: 4,
+                        hoverOffset: 16
+                    }]
+                },
+                options: {
+                    ...commonChartOptions,
+                    cutout: '60%',
+                    plugins: {
+                        ...commonChartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                        }
+                    },
+                    onHover: (event, chartElement) => {
+                        const mixTitle = document.getElementById('mix-title');
+                        const mixText = document.getElementById('mix-text');
+                        if (chartElement.length) {
+                            const index = chartElement[0].index;
+                            const label = mixDataRaw.labels[index];
+                            mixTitle.textContent = label;
+                            mixText.textContent = mixDataRaw.descriptions[label];
+                        }
+                    }
+                }
+            });
+
+            const investmentData = {
+                '2020': {
+                    labels: ['Asia', 'Europe', 'North America', 'Rest of World'].map(l => wrapText(l, 16)),
+                    data: [156, 82, 65, 41]
+                },
+                '2024': {
+                    labels: ['Asia', 'Europe', 'North America', 'Rest of World'].map(l => wrapText(l, 16)),
+                    data: [220, 110, 95, 55]
+                }
+            };
+            
+            const investmentCtx = document.getElementById('investmentChart').getContext('2d');
+            const investmentChart = new Chart(investmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: investmentData['2024'].labels,
+                    datasets: [{
+                        label: 'Investment (in Billion USD)',
+                        data: investmentData['2024'].data,
+                        backgroundColor: [chartColors.bgTeal, chartColors.bgSky, chartColors.bgIndigo, chartColors.bgAmber],
+                        borderColor: [chartColors.teal, chartColors.sky, chartColors.indigo, chartColors.amber],
+                        borderWidth: 2
+                    }]
+                },
+                options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } } }
+            });
+
+            const investmentBtns = document.querySelectorAll('.investment-btn');
+            investmentBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const year = btn.id.split('-')[1];
+                    investmentChart.data.datasets[0].data = investmentData[year].data;
+                    investmentChart.update();
+
+                    investmentBtns.forEach(b => {
+                        b.classList.remove('bg-blue-600', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                });
+            });
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+
+                    tabPanels.forEach(panel => {
+                        if (panel.id === tabId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
